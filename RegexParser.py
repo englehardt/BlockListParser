@@ -208,12 +208,13 @@ class Parser:
 
     def check_with_items(self, url, options=None):
         options = options or {}
-        if self.is_whitelisted(url, options):
-            return 1, []
+        whitelisted, items = self.is_whitelisted_with_items(url, options)
+        if whitelisted:
+            return 'whitelisted', items
         blacklisted, items = self.is_blacklisted_with_items(url, options)
         if blacklisted:
-            return -1, items
-        return 0, []
+            return 'blacklisted', items
+        return
 
     def is_whitelisted(self, url, options=None):
         return self._matches(url, options, self.whitelist, self.whitelist_require_domain, self.whitelist_with_options)
@@ -223,6 +224,9 @@ class Parser:
 
     def is_blacklisted_with_items(self, url, options=None):
         return self._matches_with_items(url, options, self.blacklist, self.blacklist_require_domain, self.blacklist_with_options)
+
+    def is_whitelisted_with_items(self, url, options=None):
+        return self._matches_with_items(url, options, self.whitelist, self.whitelist_require_domain, self.whitelist_with_options)
 
     def _matches(self, url, options, general_rules, domain_required_rules, rules_with_options):
         rules = general_rules + rules_with_options

@@ -114,6 +114,8 @@ class BlockListParser:
     def should_block_with_items(self, url, options=None):
         blacklisting_items = []
         blacklisted = False
+        whitelisting_items = []
+        whitelisted = False
         for k in xrange(len(self.shortcut_sizes)):
             shortcut_size = self.shortcut_sizes[k]
             regex_map = self.all_shortcut_parser_maps[k]
@@ -122,18 +124,25 @@ class BlockListParser:
                 if cur_sub in regex_map:
                     parser = regex_map[cur_sub]
                     state, items = parser.check_with_items(url, options)
-                    if state == 1:
-                        return False, []
-                    elif state == -1:
+                    if state == 'whitelisted':
+                        whitelisting_items += items
+                        whitelisted = True
+                    elif state == 'blacklisted':
                         blacklisting_items += items
                         blacklisted = True
         state, items = self.remaining_regex.check_with_items(url, options)
-        if state == 1:
-            return False, []
-        elif state == -1:
+        if state == 'whitelisted':
+            whitelisting_items += items
+            whitelisted = True
+        elif state == 'blacklisted':
             blacklisting_items += items
             blacklisted = True
-        return blacklisted, blacklisting_items
+
+        if whitelisted:
+            return 'whitelisted', whitelisting_items
+        elif blacklisted:
+            return 'blacklisted', blacklisting_items
+        return
 
     def get_block_class(self, url, options=None):
         if self.should_block(url, options):
