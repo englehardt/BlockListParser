@@ -13,7 +13,7 @@ class BlockListParser:
             regex_lines = regexes
         else:
             with open(regex_file) as f:
-                regex_lines = f.readlines()
+                regex_lines = [x for x in f.read().strip().split('\n') if x != '' and not x.startswith('#')]
         self.regex_lines = regex_lines
         self.fast_hashes = []
         self.print_maps = print_maps
@@ -142,7 +142,7 @@ class BlockListParser:
             return 'whitelisted', whitelisting_items
         elif blacklisted:
             return 'blacklisted', blacklisting_items
-        return
+        return None, None
 
     def get_block_class(self, url, options=None):
         if self.should_block(url, options):

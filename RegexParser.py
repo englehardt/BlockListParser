@@ -214,7 +214,7 @@ class Parser:
         blacklisted, items = self.is_blacklisted_with_items(url, options)
         if blacklisted:
             return 'blacklisted', items
-        return
+        return None, None
 
     def is_whitelisted(self, url, options=None):
         return self._matches(url, options, self.whitelist, self.whitelist_require_domain, self.whitelist_with_options)
